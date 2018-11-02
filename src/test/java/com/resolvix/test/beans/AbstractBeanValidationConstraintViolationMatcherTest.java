@@ -76,11 +76,11 @@ public class AbstractBeanValidationConstraintViolationMatcherTest {
         }
     }
 
-    private static final MockConstraintViolationMatcher mockConstraintViolationMatcher = new MockConstraintViolationMatcher();
+    private static final MockConstraintViolationMatcher MOCK_CONSTRAINT_VIOLATION_MATCHER = new MockConstraintViolationMatcher();
 
     @Test
     public void enumerateProperties() throws Exception {
-        PropertyDescriptor[] propertyDescriptors = mockConstraintViolationMatcher.enumerateProperties(Z.class);
+        PropertyDescriptor[] propertyDescriptors = MOCK_CONSTRAINT_VIOLATION_MATCHER.enumerateProperties(Z.class);
         for(PropertyDescriptor pd : propertyDescriptors) {
             System.out.println(pd.getName() + " / " + pd.getDisplayName());
             System.out.println();
@@ -102,7 +102,9 @@ public class AbstractBeanValidationConstraintViolationMatcherTest {
         Z z = new Z();
         z.shortField = 31;
 
-        Set<ConstraintViolation<Z>> constraintViolations = mockConstraintViolationMatcher.validateProperties(z, new String[]{"shortField"}, new Class<?>[]{Default.class});
+        Set<ConstraintViolation<Z>> constraintViolations = MOCK_CONSTRAINT_VIOLATION_MATCHER
+            .validateProperties(z, new String[]{"shortField"}, new Class<?>[]{Default.class});
+
         constraintViolations.stream().forEach(
             (ConstraintViolation<Z> cv) -> {
                 System.out.println(cv.getConstraintDescriptor().getAnnotation().toString());
