@@ -1,9 +1,7 @@
 package com.resolvix.lib.reflect;
 
 import com.resolvix.lib.reflect.api.PropertyDescriptorsNotFoundException;
-import com.resolvix.lib.reflect.api.PropertyNotReadableException;
 import com.resolvix.lib.reflect.api.PropertyNotFoundException;
-import com.sun.javaws.jnl.PropertyDesc;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
