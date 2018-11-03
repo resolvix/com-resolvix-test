@@ -2,6 +2,7 @@ package com.resolvix.test.beans;
 
 import javax.validation.*;
 
+import org.hamcrest.beans.PropertyUtil;
 import org.hibernate.validator.HibernateValidator;
 
 import org.hamcrest.BaseMatcher;

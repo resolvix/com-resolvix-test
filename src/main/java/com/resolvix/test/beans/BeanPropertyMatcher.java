@@ -1,5 +1,7 @@
 package com.resolvix.test.beans;
 
+import com.resolvix.lib.reflect.BeanUtils;
+import com.resolvix.lib.reflect.api.PropertyNotFoundException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
@@ -47,20 +49,19 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
         return propertyName.substring(propertyName.indexOf(PROPERTY_SEPARATOR) + 1);
     }
 
-    private Method getReadMethod(Object object, String propertyName, Description mismatchDescription) {
-        PropertyDescriptor propertyDescriptor = PropertyUtil.getPropertyDescriptor(propertyName, object);
-        if (propertyDescriptor == null) {
+    private Method getReadMethodForProperty(Object object, String propertyName, Description mismatchDescription) {
+        try {
+            Method readMethod = BeanUtils.getPropertyDescriptor(object, propertyName)
+                .getReadMethod();
+            if (readMethod == null)
+                mismatchDescription.appendText(
+                    String.format(NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE, propertyName));
+            return readMethod;
+        } catch (PropertyNotFoundException e) {
             mismatchDescription.appendText(
                 String.format(NO_PROPERTY_DESCRIPTION_TEMPLATE, propertyName));
             return null;
         }
-
-        Method readMethod = propertyDescriptor.getReadMethod();
-        if (readMethod == null)
-            mismatchDescription.appendText(
-                String.format(NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE, propertyName));
-
-        return readMethod;
     }
 
     private boolean matchPropertyValue(Object bean, Method readMethod, Description mismatchDescription)
@@ -86,7 +87,7 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
             String subMemberObjectProperty = getSubMemberObjectProperty(propertyName);
             return matchesSafely(memberObject, subMemberObjectProperty, mismatchDescription);
         } else {
-            Method readMethod = getReadMethod(bean, propertyName, mismatchDescription);
+            Method readMethod = getReadMethodForProperty(bean, propertyName, mismatchDescription);
             return (readMethod != null)
                 && matchPropertyValue(bean, readMethod, mismatchDescription);
         }
