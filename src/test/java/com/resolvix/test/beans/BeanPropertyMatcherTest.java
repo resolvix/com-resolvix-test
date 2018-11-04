@@ -1,19 +1,16 @@
 package com.resolvix.test.beans;
 
-import com.resolvix.lib.reflect.BeanUtils;
-import junit.framework.AssertionFailedError;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-
-import java.beans.PropertyDescriptor;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 public class BeanPropertyMatcherTest {
 
+    @SuppressWarnings("unused")
     public class A {
 
         private Integer a;
@@ -25,6 +22,7 @@ public class BeanPropertyMatcherTest {
         public Integer getA() { return a; }
     }
 
+    @SuppressWarnings("unused")
     public class B extends A {
 
         private Integer b;
@@ -37,6 +35,7 @@ public class BeanPropertyMatcherTest {
         public Integer getB() { return b; }
     }
 
+    @SuppressWarnings("unused")
     public class C extends B {
 
         private Integer c;
@@ -47,8 +46,19 @@ public class BeanPropertyMatcherTest {
         }
 
         public Integer getC() { return c; }
+
+        public Integer getD() {
+            throw new RuntimeException();
+        }
+
+        public void setE(Integer e) { }
+
+        Integer getF() {
+            return 0;
+        }
     }
 
+    @SuppressWarnings("unused")
     public class D {
 
         private A a;
@@ -70,7 +80,9 @@ public class BeanPropertyMatcherTest {
     }
 
     private Integer a = 1;
+
     private Integer b = 2;
+
     private Integer c = 3;
 
     private A objectA;
@@ -80,6 +92,9 @@ public class BeanPropertyMatcherTest {
     private C objectC;
 
     private D objectD;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void before() {
@@ -94,19 +109,34 @@ public class BeanPropertyMatcherTest {
         assertThat(objectA, BeanPropertyMatcher.of("a", equalTo(a)));
     }
 
+    @Test
     public void BeanPropertyMatcher_success_inherited_properties() {
         assertThat(objectB, BeanPropertyMatcher.of("a", equalTo(a)));
         assertThat(objectC, BeanPropertyMatcher.of("a", equalTo(a)));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void BeanPropertyMatcher_failure_value_mismatch() {
+        thrown.expect(AssertionError.class);
         assertThat(objectA, BeanPropertyMatcher.of( "a", equalTo(0)));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void BeanPropertyMatcher_failure_property_not_found() {
+        thrown.expect(AssertionError.class);
         assertThat(objectA, BeanPropertyMatcher.of( "b", equalTo(0)));
+    }
+
+    @Test
+    public void BeanPropertyMatcher_failure_property_not_readable() {
+        thrown.expect(AssertionError.class);
+        assertThat(objectC, BeanPropertyMatcher.of("e", equalTo(0)));
+    }
+
+    @Test
+    public void BeanPropertyMatcher_failure_property_exception() {
+        thrown.expect(AssertionError.class);
+        assertThat(objectC, BeanPropertyMatcher.of( "d", equalTo(0)));
     }
 
     @Test
@@ -120,13 +150,33 @@ public class BeanPropertyMatcherTest {
         assertThat(objectD, BeanPropertyMatcher.of("c.a", equalTo(a)));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void ComposedBeanPropertyMatcher_failure_value_mismatch() {
+        thrown.expect(AssertionError.class);
         assertThat(objectD, BeanPropertyMatcher.of("c.a", equalTo(0)));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void ComposedBeanPropertyMatcher_failure_property_not_found() {
-        assertThat(objectA, BeanPropertyMatcher.of( "c.d", equalTo(0)));
+        thrown.expect(AssertionError.class);
+        assertThat(objectD, BeanPropertyMatcher.of( "c.g", equalTo(0)));
+    }
+
+    @Test
+    public void ComposedBeanPropertyMatcher_failure_property_not_readable() {
+        thrown.expect(AssertionError.class);
+        assertThat(objectD, BeanPropertyMatcher.of("c.e", equalTo(0)));
+    }
+
+    @Test
+    public void ComposedBeanPropertyMatcher_failure_property_exception() {
+        thrown.expect(AssertionError.class);
+        assertThat(objectD, BeanPropertyMatcher.of( "c.d", equalTo(0)));
+    }
+
+    @Test
+    public void ComposedBeanPropertyMatcher_failure_property_not_accessible() {
+        thrown.expect(AssertionError.class);
+        assertThat(objectD, BeanPropertyMatcher.of( "c.f", equalTo(0)));
     }
 }

@@ -88,9 +88,15 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
             mismatchDescription.appendText(
                 String.format(INVOCATION_EXCEPTION_PROPERTY_DESCRIPTION_TEMPLATE, safePath(node)));
         } catch (IllegalAccessException e) {
+            //
+            //  The `IllegalAccessException` is effectively masked by the
+            //  `PropertyNotFoundException` and should not, therefore, occur
+            //  under any circumstances.
+            //
             mismatchDescription.appendText(
                 String.format(ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE, safePath(node)));
         }
+
         return false;
     }
 
