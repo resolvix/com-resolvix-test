@@ -49,7 +49,7 @@ public class PathImpl implements Path {
     {
 
         int toIndex = path.indexOf(nodeSeparator, fromIndex);
-        String nodePath = (nodeIndex == 0 && toIndex != -1)
+        String nodePath = (nodeIndex == 0 || toIndex != -1)
             ? path
             : path.substring(0, fromIndex);
         if (toIndex == -1) {

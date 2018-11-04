@@ -21,7 +21,7 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
 
     private static final String ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" cannot be accessed.";
 
-    private static final String NO_PROPERTY_DESCRIPTION_TEMPLATE = "No property \"%s\" ";
+    private static final String NO_PROPERTY_DESCRIPTION_TEMPLATE = "no property \"%s\" is available";
 
     private static final String NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" is not readable.";
 
