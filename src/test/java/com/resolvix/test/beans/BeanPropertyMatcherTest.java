@@ -1,6 +1,7 @@
 package com.resolvix.test.beans;
 
 import com.resolvix.lib.reflect.BeanUtils;
+import junit.framework.AssertionFailedError;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.Before;
@@ -89,16 +90,27 @@ public class BeanPropertyMatcherTest {
     }
 
     @Test
-    public void singleLevelPropertyTest() throws Exception {
+    public void BeanPropertyMatcher_success() {
         assertThat(objectA, BeanPropertyMatcher.of("a", equalTo(a)));
         assertThat(objectB, BeanPropertyMatcher.of("b", equalTo(b)));
         assertThat(objectC, BeanPropertyMatcher.of("c", equalTo(c)));
     }
 
+    @Test(expected = AssertionError.class)
+    public void BeanPropertyMatcher_failure_due_to_value_mismatch() {
+        assertThat(objectA, BeanPropertyMatcher.of( "a", equalTo(0)));
+    }
+
     @Test
-    public void twoLevelPropertyTest() {
+    public void ComposedBeanPropertyMatcher_success() {
         assertThat(objectD, BeanPropertyMatcher.of("a.a", equalTo(a)));
         assertThat(objectD, BeanPropertyMatcher.of("b.b", equalTo(b)));
         assertThat(objectD, BeanPropertyMatcher.of("c.c", equalTo(c)));
     }
+
+    @Test(expected = AssertionError.class)
+    public void ComposedBeanPropertyMatcher_failure_due_to_value_mismatch() {
+        assertThat(objectD, BeanPropertyMatcher.of("c.a", equalTo(0)));
+    }
+
 }

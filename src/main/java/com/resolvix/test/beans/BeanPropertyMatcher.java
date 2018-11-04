@@ -21,15 +21,15 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
 
     private static final String ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" cannot be accessed.";
 
-    private static final String NO_PROPERTY_DESCRIPTION_TEMPLATE = "No property \"%s\"";
+    private static final String NO_PROPERTY_DESCRIPTION_TEMPLATE = "No property \"%s\" ";
 
     private static final String NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" is not readable.";
 
     private static final String INVOCATION_EXCEPTION_PROPERTY_DESCRIPTION_TEMPLATE = "The getter for property \"%s\" generated an exception.";
 
-    private static final String PROPERTY_DESCRIPTION_TEMPLATE = "property %s = ";
+    private static final String PROPERTY_DESCRIPTION_TEMPLATE = "property \"%s\" is ";
 
-    private static final String PROPERTY_VALUE_TEMPLATE = "property \"%s\"";
+    private static final String PROPERTY_VALUE_TEMPLATE = "property \"%s\" ";
 
     private static final String NULL_PATH = "(null)";
 
@@ -72,10 +72,8 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
 
             boolean valueMatches = valueMatcher.matches(object);
             if (!valueMatches) {
-                if (!mismatchDescription.toString().isEmpty())
-                    mismatchDescription.appendText(PROPERTY_DESCRIPTION_COMMA_SEPARATOR);
                 mismatchDescription.appendText(
-                    String.format(PROPERTY_VALUE_TEMPLATE, node.getPath()));
+                    String.format(PROPERTY_VALUE_TEMPLATE, propertyPath.getPath()));
                 valueMatcher.describeMismatch(object, mismatchDescription);
             }
 
@@ -98,10 +96,8 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
 
     @Override
     public void describeTo(Description description) {
-        if (description.toString().length() > 0)
-            description.appendText(PROPERTY_DESCRIPTION_COMMA_SEPARATOR);
         description.appendText(
-            String.format(PROPERTY_DESCRIPTION_TEMPLATE, propertyPath.toString()));
+            String.format(PROPERTY_DESCRIPTION_TEMPLATE, propertyPath.getPath()));
         description.appendDescriptionOf(valueMatcher);
         description.appendText(PROPERTY_DESCRIPTION_SEPARATOR);
     }

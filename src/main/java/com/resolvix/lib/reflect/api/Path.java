@@ -10,5 +10,7 @@ public interface Path {
         String getPath();
     }
 
+    String getPath();
+
     Iterator<Node> iterator();
 }

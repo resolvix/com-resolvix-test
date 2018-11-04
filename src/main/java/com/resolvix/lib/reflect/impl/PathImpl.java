@@ -38,46 +38,55 @@ public class PathImpl implements Path {
         }
     }
 
+    private String path;
+
     private List<Node> nodes;
 
     private void pathToNodeList(
-        String beanPath, int nodeSeparator,
+        String path, int nodeSeparator,
         int fromIndex, List<Node> toNodes,
         int nodeIndex)
     {
-        String nodePath = (nodeIndex == 0)
-            ? beanPath
-            : beanPath.substring(0, fromIndex);
-        int toIndex = beanPath.indexOf(nodeSeparator, fromIndex);
+
+        int toIndex = path.indexOf(nodeSeparator, fromIndex);
+        String nodePath = (nodeIndex == 0 && toIndex != -1)
+            ? path
+            : path.substring(0, fromIndex);
         if (toIndex == -1) {
             toNodes.add(new NodeImpl(
                 nodePath,
-                beanPath.substring(fromIndex),
+                path.substring(fromIndex),
                 nodeIndex));
         } else {
             toNodes.add(new NodeImpl(
                 nodePath,
-                beanPath.substring(fromIndex, toIndex),
+                path.substring(fromIndex, toIndex),
                 nodeIndex));
-            pathToNodeList(beanPath, nodeSeparator, toIndex + 1, toNodes, nodeIndex +1);
+            pathToNodeList(path, nodeSeparator, toIndex + 1, toNodes, nodeIndex +1);
         }
     }
 
-    private PathImpl(String beanPath, int separator) {
+    private PathImpl(String path, int separator) {
+        this.path = path;
         this.nodes = new LinkedList<>();
-        pathToNodeList(beanPath, separator, 0, nodes, 0);
+        pathToNodeList(path, separator, 0, nodes, 0);
     }
 
-    private PathImpl(String beanPath) {
-        this(beanPath, DEFAULT_NODE_SEPARATOR);
+    private PathImpl(String path) {
+        this(path, DEFAULT_NODE_SEPARATOR);
     }
 
-    public static PathImpl of(String beanPath, int separator) {
-        return new PathImpl(beanPath, separator);
+    public static PathImpl of(String path, int separator) {
+        return new PathImpl(path, separator);
     }
 
-    public static PathImpl of(String beanPath) {
-        return new PathImpl(beanPath);
+    public static PathImpl of(String path) {
+        return new PathImpl(path);
+    }
+
+    @Override
+    public String getPath() {
+        return path;
     }
 
     @Override
