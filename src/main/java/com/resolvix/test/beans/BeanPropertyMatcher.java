@@ -29,13 +29,17 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
     private String propertyName;
     private Matcher<?> valueMatcher;
 
-    public BeanPropertyMatcher(String propertyName, Matcher<?> valueMatcher) {
+    private BeanPropertyMatcher(String propertyName, Matcher<?> valueMatcher) {
         this.propertyName = propertyName;
         this.valueMatcher = valueMatcher;
     }
 
+    public static <T> BeanPropertyMatcher<T> of(String propertyName, Matcher<?> valueMatcher) {
+        return new BeanPropertyMatcher(propertyName, valueMatcher);
+    }
+
     private String getMemberObjectProperty(String propertyName) {
-        return propertyName.substring(0, propertyName.indexOf(PROPERTY_SEPARATOR) + 1);
+        return propertyName.substring(0, propertyName.indexOf(PROPERTY_SEPARATOR));
     }
 
     private Object getPropertyValue(Object object, String propertyName)
