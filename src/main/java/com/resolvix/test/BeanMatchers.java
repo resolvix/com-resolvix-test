@@ -1,7 +1,7 @@
 package com.resolvix.test;
 
-import com.resolvix.test.beans.BeanMatcher;
-import com.resolvix.test.beans.BeanPropertyMatcher;
+import com.resolvix.test.bean.BeanMatcher;
+import com.resolvix.test.bean.BeanPropertyMatcher;
 import org.hamcrest.Matcher;
 
 public class BeanMatchers {

@@ -1,4 +1,4 @@
-package com.resolvix.test.beans;
+package com.resolvix.test.bean;
 
 import com.resolvix.lib.reflect.BeanUtils;
 import com.resolvix.lib.reflect.api.Path;

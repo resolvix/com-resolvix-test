@@ -1,8 +1,9 @@
-package com.resolvix.test.beans;
+package com.resolvix.test.bean;
 
+import com.resolvix.test.bean.base.AbstractBeanValidationConstraintViolationMatcher;
 import org.hamcrest.Description;
 
-public class GeneratesNoConstraintViolations<T>
+public class GeneratesConstraintViolations<T>
     extends AbstractBeanValidationConstraintViolationMatcher<T>
 {
     @Override

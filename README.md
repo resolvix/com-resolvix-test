@@ -1,8 +1,10 @@
-# Resolvix Test Library 
+# Resolvix Java Test Library 
 
-A library to support test driven development practices.
+A library to support test driven development ("**TDD**") practices with the
+object of reducing software development overhead.
 
-This library is a work-in-progress and is subject to periodic change and re-organization.
+This library is a work-in-progress and is subject to periodic change and 
+re-organization.
 
 ## Java Beans
 
@@ -21,10 +23,10 @@ property values.
         BeanMatchers.has(
             BeanMatchers.property(
                 <propertyPath>,
-                <Matcher<?>>),
-            BeanMatchers.propery(
+                <valueMatcher>),
+            BeanMatchers.property(
                 <propertyPath>,
-                <Matcher<?>>));
+                <valueMatcher>));
 
 ### BeanPropertyMatcher
 
@@ -36,7 +38,7 @@ Hamcrest -derived matcher to identify mismatches in bean property values.
         <bean>,
         BeanMatchers.property(
         <propertyPath>,
-        <Matcher<?>>));
+        <valueMatcher>));
 
 ### GeneratesConstraintViolations
 

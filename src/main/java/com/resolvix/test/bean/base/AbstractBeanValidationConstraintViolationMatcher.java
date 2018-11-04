@@ -1,15 +1,11 @@
-package com.resolvix.test.beans;
-
-import javax.validation.*;
-
-import org.hamcrest.beans.PropertyUtil;
-import org.hibernate.validator.HibernateValidator;
+package com.resolvix.test.bean.base;
 
 import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-import java.beans.BeanInfo;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -18,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-abstract class AbstractBeanValidationConstraintViolationMatcher<T>
+public abstract class AbstractBeanValidationConstraintViolationMatcher<T>
     extends BaseMatcher<T>
 {
     protected AbstractBeanValidationConstraintViolationMatcher() { }

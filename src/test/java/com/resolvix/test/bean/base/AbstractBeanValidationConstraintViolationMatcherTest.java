@@ -1,5 +1,6 @@
-package com.resolvix.test.beans;
+package com.resolvix.test.bean.base;
 
+import com.resolvix.test.bean.base.AbstractBeanValidationConstraintViolationMatcher;
 import org.hamcrest.Description;
 import org.junit.Test;
 

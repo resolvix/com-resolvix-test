@@ -1,4 +1,4 @@
-package com.resolvix.test.beans;
+package com.resolvix.test.bean;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

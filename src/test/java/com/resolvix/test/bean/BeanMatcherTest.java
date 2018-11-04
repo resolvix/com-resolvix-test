@@ -1,4 +1,4 @@
-package com.resolvix.test.beans;
+package com.resolvix.test.bean;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -191,6 +191,7 @@ public class BeanMatcherTest {
 
     @Test
     public void BeanMatcher_failure() {
+        thrown.expect(AssertionError.class);
         assertThat(objectD, BeanMatcher.of(
             BeanPropertyMatcher.of("a.a", equalTo(1)),
             BeanPropertyMatcher.of("c.a", equalTo(0)),
