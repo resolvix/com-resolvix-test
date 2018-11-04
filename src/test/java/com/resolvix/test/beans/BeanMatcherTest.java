@@ -8,7 +8,7 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class BeanPropertyMatcherTest {
+public class BeanMatcherTest {
 
     @SuppressWarnings("unused")
     public class A {
@@ -178,5 +178,23 @@ public class BeanPropertyMatcherTest {
     public void ComposedBeanPropertyMatcher_failure_property_not_accessible() {
         thrown.expect(AssertionError.class);
         assertThat(objectD, BeanPropertyMatcher.of( "c.f", equalTo(0)));
+    }
+
+    @Test
+    public void BeanMatcher_success() {
+        assertThat(objectD, BeanMatcher.of(
+            BeanPropertyMatcher.of( "a.a", equalTo(1)),
+            BeanPropertyMatcher.of("b.b", equalTo(2)),
+            BeanPropertyMatcher.of("c.c", equalTo(3))
+        ));
+    }
+
+    @Test
+    public void BeanMatcher_failure() {
+        assertThat(objectD, BeanMatcher.of(
+            BeanPropertyMatcher.of("a.a", equalTo(1)),
+            BeanPropertyMatcher.of("c.a", equalTo(0)),
+            BeanPropertyMatcher.of("c.b", equalTo(0))
+        ));
     }
 }

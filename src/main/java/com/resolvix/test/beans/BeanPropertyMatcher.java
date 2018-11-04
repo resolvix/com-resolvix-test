@@ -19,13 +19,13 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
 
     private static final String PROPERTY_DESCRIPTION_COMMA_SEPARATOR = ", ";
 
-    private static final String ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" cannot be accessed.";
+    private static final String ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" cannot be accessed";
 
     private static final String NO_PROPERTY_DESCRIPTION_TEMPLATE = "no property \"%s\" is available";
 
-    private static final String NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" is not readable.";
+    private static final String NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" is not readable";
 
-    private static final String INVOCATION_EXCEPTION_PROPERTY_DESCRIPTION_TEMPLATE = "The getter for property \"%s\" generated an exception.";
+    private static final String INVOCATION_EXCEPTION_PROPERTY_DESCRIPTION_TEMPLATE = "The getter for property \"%s\" generated an exception";
 
     private static final String PROPERTY_DESCRIPTION_TEMPLATE = "property \"%s\" is ";
 
@@ -105,6 +105,5 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
         description.appendText(
             String.format(PROPERTY_DESCRIPTION_TEMPLATE, propertyPath.getPath()));
         description.appendDescriptionOf(valueMatcher);
-        description.appendText(PROPERTY_DESCRIPTION_SEPARATOR);
     }
 }

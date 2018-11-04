@@ -3,22 +3,27 @@ package com.resolvix.test.beans;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
+import org.hamcrest.StringDescription;
 
 public class BeanMatcher<T> extends BaseMatcher<T> {
 
     private static final String MISMATCH_SEPARATOR = "; ";
 
     private BeanPropertyMatcher[] propertyMatchers;
-    private Description expectedDescription;
-    private Description mismatchDescription;
+    private Description expectedDescription = new StringDescription();
+    private Description mismatchDescription = new StringDescription();
 
-    public BeanMatcher(BeanPropertyMatcher<?>... propertyMatchers) {
+    private BeanMatcher(BeanPropertyMatcher<?>... propertyMatchers) {
         this.propertyMatchers = propertyMatchers;
+    }
+
+    public static <T> BeanMatcher<T> of(BeanPropertyMatcher<?>... propertyMatchers) {
+        return new BeanMatcher<>(propertyMatchers);
     }
 
     private void appendMatcherDescriptions(Object item, Matcher<?> matcher) {
         matcher.describeTo(expectedDescription);
+        expectedDescription.appendText(MISMATCH_SEPARATOR);
         matcher.describeMismatch(item, mismatchDescription);
         mismatchDescription.appendText(MISMATCH_SEPARATOR);
     }
