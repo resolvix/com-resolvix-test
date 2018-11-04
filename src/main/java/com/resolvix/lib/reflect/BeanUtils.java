@@ -1,7 +1,10 @@
 package com.resolvix.lib.reflect;
 
+import com.resolvix.lib.reflect.api.Path;
 import com.resolvix.lib.reflect.api.PropertyDescriptorsNotFoundException;
 import com.resolvix.lib.reflect.api.PropertyNotFoundException;
+import com.resolvix.lib.reflect.api.PropertyNotReadableException;
+import com.resolvix.lib.reflect.impl.PathImpl;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -82,21 +85,32 @@ public class BeanUtils {
         return getPropertyDescriptor(bean.getClass(), propertyName);
     }
 
-    private Object getProperty(Object object, String propertyName)
-        throws PropertyNotFoundException, IllegalAccessException, InvocationTargetException {
+    public static Object getProperty(Object object, String propertyName)
+        throws PropertyNotFoundException, PropertyNotReadableException,
+            IllegalAccessException, InvocationTargetException {
         if (object == null)
             throw new IllegalArgumentException();
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(object.getClass(), propertyName);
         Method readMethod = propertyDescriptor.getReadMethod();
+        if (readMethod == null)
+            throw new PropertyNotReadableException();
         return readMethod.invoke(object, NO_ARGUMENTS);
     }
 
-    public <V> void setProperty(Object object, String propertyName, V v)
+    public static <V> void setProperty(Object object, String propertyName, V v)
         throws PropertyNotFoundException, IllegalAccessException, InvocationTargetException {
         if (object == null)
             throw new IllegalArgumentException();
         PropertyDescriptor propertyDescriptor = getPropertyDescriptor(object.getClass(), propertyName);
         Method writeMethod = propertyDescriptor.getWriteMethod();
         writeMethod.invoke(object, v);
+    }
+
+    public static Path toPath(String beanPath) {
+        return PathImpl.of(beanPath);
+    }
+
+    public static Path toPath(String beanPath, int nodeSeparator) {
+        return PathImpl.of(beanPath, nodeSeparator);
     }
 }

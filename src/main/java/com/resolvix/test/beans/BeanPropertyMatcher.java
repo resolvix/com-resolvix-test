@@ -1,109 +1,99 @@
 package com.resolvix.test.beans;
 
 import com.resolvix.lib.reflect.BeanUtils;
+import com.resolvix.lib.reflect.api.Path;
 import com.resolvix.lib.reflect.api.PropertyNotFoundException;
+import com.resolvix.lib.reflect.api.PropertyNotReadableException;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
-import org.hamcrest.beans.PropertyUtil;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 
 public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
 
-    private static final String PROPERTY_SEPARATOR = ".";
+    private static final int DEFAULT_PROPERTY_SEPARATOR = '.';
 
     private static final String PROPERTY_DESCRIPTION_SEPARATOR = " ";
 
     private static final String PROPERTY_DESCRIPTION_COMMA_SEPARATOR = ", ";
 
+    private static final String ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" cannot be accessed.";
+
     private static final String NO_PROPERTY_DESCRIPTION_TEMPLATE = "No property \"%s\"";
 
     private static final String NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE = "Property \"%s\" is not readable.";
+
+    private static final String INVOCATION_EXCEPTION_PROPERTY_DESCRIPTION_TEMPLATE = "The getter for property \"%s\" generated an exception.";
 
     private static final String PROPERTY_DESCRIPTION_TEMPLATE = "property %s = ";
 
     private static final String PROPERTY_VALUE_TEMPLATE = "property \"%s\"";
 
-    private String propertyName;
+    private static final String NULL_PATH = "(null)";
+
+    private Path propertyPath;
+
     private Matcher<?> valueMatcher;
 
-    private BeanPropertyMatcher(String propertyName, Matcher<?> valueMatcher) {
-        this.propertyName = propertyName;
+
+    private BeanPropertyMatcher(String propertyPath, Matcher<?> valueMatcher) {
+        this.propertyPath = BeanUtils.toPath(propertyPath, DEFAULT_PROPERTY_SEPARATOR);
         this.valueMatcher = valueMatcher;
     }
 
-    public static <T> BeanPropertyMatcher<T> of(String propertyName, Matcher<?> valueMatcher) {
-        return new BeanPropertyMatcher(propertyName, valueMatcher);
+    public static <T> BeanPropertyMatcher<T> of(String propertyPath, Matcher<?> valueMatcher) {
+        return new BeanPropertyMatcher<>(propertyPath, valueMatcher);
     }
 
-    private String getMemberObjectProperty(String propertyName) {
-        return propertyName.substring(0, propertyName.indexOf(PROPERTY_SEPARATOR));
-    }
-
-    private Object getPropertyValue(Object object, String propertyName)
-        throws Exception {
-        PropertyDescriptor propertyDescriptor = PropertyUtil.getPropertyDescriptor(propertyName, object);
-        Method readMethod = propertyDescriptor.getReadMethod();
-        return readMethod.invoke(object, PropertyUtil.NO_ARGUMENTS);
-    }
-
-    private String getSubMemberObjectProperty(String propertyName) {
-        return propertyName.substring(propertyName.indexOf(PROPERTY_SEPARATOR) + 1);
-    }
-
-    private Method getReadMethodForProperty(Object object, String propertyName, Description mismatchDescription) {
-        try {
-            Method readMethod = BeanUtils.getPropertyDescriptor(object, propertyName)
-                .getReadMethod();
-            if (readMethod == null)
-                mismatchDescription.appendText(
-                    String.format(NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE, propertyName));
-            return readMethod;
-        } catch (PropertyNotFoundException e) {
-            mismatchDescription.appendText(
-                String.format(NO_PROPERTY_DESCRIPTION_TEMPLATE, propertyName));
-            return null;
-        }
-    }
-
-    private boolean matchPropertyValue(Object bean, Method readMethod, Description mismatchDescription)
-            throws Exception {
-        Object propertyValue = readMethod.invoke(bean, PropertyUtil.NO_ARGUMENTS);
-        boolean valueMatches = valueMatcher.matches(propertyValue);
-        if (!valueMatches) {
-            if (!mismatchDescription.toString().isEmpty())
-                mismatchDescription.appendText(", ");
-            mismatchDescription.appendText(
-                String.format(PROPERTY_VALUE_TEMPLATE, propertyName));
-            valueMatcher.describeMismatch(propertyValue, mismatchDescription);
-        }
-        return valueMatches;
-    }
-
-    private boolean matchesSafely(Object bean, String propertyName, Description mismatchDescription)
-        throws Exception {
-        Object parentObject = bean;
-        if (propertyName.contains(PROPERTY_SEPARATOR)) {
-            String memberObjectProperty = getMemberObjectProperty(propertyName);
-            Object memberObject = getPropertyValue(parentObject, memberObjectProperty);
-            String subMemberObjectProperty = getSubMemberObjectProperty(propertyName);
-            return matchesSafely(memberObject, subMemberObjectProperty, mismatchDescription);
-        } else {
-            Method readMethod = getReadMethodForProperty(bean, propertyName, mismatchDescription);
-            return (readMethod != null)
-                && matchPropertyValue(bean, readMethod, mismatchDescription);
-        }
+    private String safePath(Path.Node node) {
+        if (node == null)
+            return NULL_PATH;
+        return node.getPath();
     }
 
     @Override
-    public boolean matchesSafely(T beanT, Description mismatchDescription) {
+    public boolean matchesSafely(Object bean, Description mismatchDescription) {
+        Object object = bean;
+        Iterator<Path.Node> it = propertyPath.iterator();
+        Path.Node node = null;
         try {
-            return matchesSafely(beanT, propertyName, mismatchDescription);
-        } catch (Exception e) {
-            return false;
+            if (!it.hasNext())
+                throw new IllegalStateException();
+
+            do {
+                node = it.next();
+                if (node == null)
+                    throw new IllegalStateException();
+
+                object = BeanUtils.getProperty(object, node.getName());
+            } while (it.hasNext());
+
+            boolean valueMatches = valueMatcher.matches(object);
+            if (!valueMatches) {
+                if (!mismatchDescription.toString().isEmpty())
+                    mismatchDescription.appendText(PROPERTY_DESCRIPTION_COMMA_SEPARATOR);
+                mismatchDescription.appendText(
+                    String.format(PROPERTY_VALUE_TEMPLATE, node.getPath()));
+                valueMatcher.describeMismatch(object, mismatchDescription);
+            }
+
+            return valueMatches;
+        } catch (PropertyNotFoundException e) {
+            mismatchDescription.appendText(
+                String.format(NO_PROPERTY_DESCRIPTION_TEMPLATE, safePath(node)));
+        } catch (PropertyNotReadableException e) {
+            mismatchDescription.appendText(
+                String.format(NON_READABLE_PROPERTY_DESCRIPTION_TEMPLATE, safePath(node)));
+        } catch (InvocationTargetException e) {
+            mismatchDescription.appendText(
+                String.format(INVOCATION_EXCEPTION_PROPERTY_DESCRIPTION_TEMPLATE, safePath(node)));
+        } catch (IllegalAccessException e) {
+            mismatchDescription.appendText(
+                String.format(ACCESS_DENIED_PROPERTY_DESCRIPTION_TEMPLATE, safePath(node)));
         }
+        return false;
     }
 
     @Override
@@ -111,7 +101,7 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
         if (description.toString().length() > 0)
             description.appendText(PROPERTY_DESCRIPTION_COMMA_SEPARATOR);
         description.appendText(
-            String.format(PROPERTY_DESCRIPTION_TEMPLATE, propertyName));
+            String.format(PROPERTY_DESCRIPTION_TEMPLATE, propertyPath.toString()));
         description.appendDescriptionOf(valueMatcher);
         description.appendText(PROPERTY_DESCRIPTION_SEPARATOR);
     }
