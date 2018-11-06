@@ -6,6 +6,7 @@ import com.resolvix.lib.reflect.api.PropertyNotReadableException;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -84,6 +85,25 @@ public class EntityMatcher<T> extends TypeSafeDiagnosingMatcher<Supplier<T>> {
         return object.toString();
     }
 
+    private boolean typeEquals(Class<?> classL, Class<?> classR) {
+        if (classR.isPrimitive()) {
+            try {
+                Field typeField = classL.getField("TYPE");
+                Class<?> primitiveTypeClassL = (Class<?>) typeField.get(null);
+                if (primitiveTypeClassL == null)
+                    return false;
+
+                return primitiveTypeClassL.equals(classR);
+            } catch (NoSuchFieldException e) {
+                return false;
+            } catch (IllegalAccessException e) {
+                return false;
+            }
+        }
+
+        return classL.equals(classR);
+    }
+
     private boolean matchesSafely(T t, PropertyValue propertyValue, Description description) {
         String name = propertyValue.getName();
         Class<?> type = propertyValue.getType();
@@ -111,8 +131,7 @@ public class EntityMatcher<T> extends TypeSafeDiagnosingMatcher<Supplier<T>> {
                 description.appendText(
                     String.format(PROPERTY_MISMATCH_TEMPLATE, name, safeValue(object)));
                 return false;
-            } else if (!type.equals(value.getClass())
-                && !type.equals((Class<?>) value.getClass().getField("TYPE").get(null))) {
+            } else if (!typeEquals(value.getClass(), type)) {
                 description.appendText(
                     String.format(PROPERTY_TYPE_EXPECTATIONS_TEMPLATE, name, type, value));
                 description.appendText(
@@ -121,9 +140,6 @@ public class EntityMatcher<T> extends TypeSafeDiagnosingMatcher<Supplier<T>> {
             }
 
             return true;
-        } catch (NoSuchFieldException e) {
-            description.appendText(
-                "Exception raised: no such field");
         } catch (PropertyNotFoundException e) {
             description.appendText(
                 String.format(PROPERTY_NOT_FOUND_TEMPLATE, name));
