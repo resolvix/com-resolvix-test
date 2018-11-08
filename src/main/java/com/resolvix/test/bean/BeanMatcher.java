@@ -9,15 +9,15 @@ public class BeanMatcher<T> extends BaseMatcher<T> {
 
     private static final String MISMATCH_SEPARATOR = "; ";
 
-    private BeanPropertyMatcher[] propertyMatchers;
+    private HasProperty[] propertyMatchers;
     private Description expectedDescription = new StringDescription();
     private Description mismatchDescription = new StringDescription();
 
-    private BeanMatcher(BeanPropertyMatcher<?>... propertyMatchers) {
+    private BeanMatcher(HasProperty<?>... propertyMatchers) {
         this.propertyMatchers = propertyMatchers;
     }
 
-    public static <T> BeanMatcher<T> of(BeanPropertyMatcher<?>... propertyMatchers) {
+    public static <T> BeanMatcher<T> of(HasProperty<?>... propertyMatchers) {
         return new BeanMatcher<>(propertyMatchers);
     }
 
@@ -41,7 +41,7 @@ public class BeanMatcher<T> extends BaseMatcher<T> {
     @Override
     public boolean matches(Object item) {
         boolean matches = true;
-        for (BeanPropertyMatcher<?> propertyMatcher : propertyMatchers) {
+        for (HasProperty<?> propertyMatcher : propertyMatchers) {
             if (!propertyMatcher.matches(item)) {
                 matches = false;
                 appendMatcherDescriptions(item, propertyMatcher);
