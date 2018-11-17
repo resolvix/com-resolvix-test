@@ -6,28 +6,6 @@ object of reducing software development overhead.
 This library is a work-in-progress and is subject to periodic change and 
 re-organization.
 
-## Entity Classes 
-
-Hamcrest -derived matchers to support the analysis of classes that implement
-"_entity classes_", plain-old-Java-objects that are intended to contain data
-sourced from `java.sql.ResultSet` objects and to allow that data to be
-retrieved, using `get` \[and `is` (?)\] methods, in their original or a
-near-original form.
-
-### EntityMatcher
-
-Hamcrest -derived matcher to identify one or more mismatches in the
-initialisation of an instance of an _entity class_ by a supplier method:
-a constructor, or a factory method.
-
-#### Usage
-
-    assertThat(
-        <Supplier<entityClass>>,
-        new EntityMatcher(
-            PropertyValue(<name>, <type>, <value>),
-            ...));
-
 ## Java Beans
 
 Hamcrest -derived matchers to support the analysis of Java Beans either as
