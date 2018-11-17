@@ -11,7 +11,7 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 
-public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
+public class HasProperty<T> extends TypeSafeDiagnosingMatcher<T> {
 
     private static final int DEFAULT_PROPERTY_SEPARATOR = '.';
 
@@ -38,13 +38,13 @@ public class BeanPropertyMatcher<T> extends TypeSafeDiagnosingMatcher<T> {
     private Matcher<?> valueMatcher;
 
 
-    private BeanPropertyMatcher(String propertyPath, Matcher<?> valueMatcher) {
+    private HasProperty(String propertyPath, Matcher<?> valueMatcher) {
         this.propertyPath = BeanUtils.toPath(propertyPath, DEFAULT_PROPERTY_SEPARATOR);
         this.valueMatcher = valueMatcher;
     }
 
-    public static <T> BeanPropertyMatcher<T> of(String propertyPath, Matcher<?> valueMatcher) {
-        return new BeanPropertyMatcher<>(propertyPath, valueMatcher);
+    public static <T> HasProperty<T> of(String propertyPath, Matcher<?> valueMatcher) {
+        return new HasProperty<>(propertyPath, valueMatcher);
     }
 
     private String safePath(Path.Node node) {

@@ -1,16 +1,17 @@
 package com.resolvix.test;
 
 import com.resolvix.test.bean.BeanMatcher;
-import com.resolvix.test.bean.BeanPropertyMatcher;
+import com.resolvix.test.bean.HasProperty;
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 
 public class BeanMatchers {
 
-    public static <T> BeanMatcher<T> has(BeanPropertyMatcher<?>... beanPropertyMatchers) {
-        return BeanMatcher.of(beanPropertyMatchers);
+    public static <T> BeanMatcher<T> has(HasProperty<?>... hasProperties) {
+        return BeanMatcher.of(hasProperties);
     }
 
-    public static <T> BeanPropertyMatcher<T> property(String path, Matcher<?> valueMatcher) {
-        return BeanPropertyMatcher.of(path, valueMatcher);
+    public static <T> HasProperty<T> hasProperty(String path, Matcher<?> valueMatcher) {
+        return HasProperty.of(path, valueMatcher);
     }
 }
