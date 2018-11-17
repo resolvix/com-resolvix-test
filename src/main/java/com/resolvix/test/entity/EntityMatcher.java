@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.function.Supplier;
 
+@Deprecated
 public class EntityMatcher<T> extends TypeSafeDiagnosingMatcher<Supplier<T>> {
 
     private static final String TYPE_CANNOT_BE_NULL = "type cannot be null";

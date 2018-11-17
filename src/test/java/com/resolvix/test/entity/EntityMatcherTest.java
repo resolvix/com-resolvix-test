@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.util.function.Supplier;
 
+@Deprecated
 public class EntityMatcherTest {
 
     public class LocalEntity {
